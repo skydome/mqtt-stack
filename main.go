@@ -1,18 +1,17 @@
 package main
 
 import (
-	"flag"
 	"fmt"
 	broker "github.com/abdulkadiryaman/hrotti/broker"
 	command "github.com/hashicorp/consul/command"
 	"github.com/hashicorp/consul/command/agent"
 	consul "github.com/hashicorp/consul/consul"
 	"github.com/mitchellh/cli"
+	"log"
 	"os"
 	"os/signal"
 	"syscall"
 	"time"
-	"log"
 )
 
 func bootstrapConsul(dc string, bootstrap bool) {
@@ -23,9 +22,9 @@ func bootstrapConsul(dc string, bootstrap bool) {
 
 	var agentArgs []string
 	if bootstrap {
-		agentArgs = []string{"-server", "-bootstrap", "-node", private.String(), "-dc", dc, "-data-dir", "/tmp/consul"}
+		agentArgs = []string{"-server", "-bootstrap", "-node", "skydome-mqtt-" + private.String(), "-dc", dc, "-data-dir", "/tmp/consul"}
 	} else {
-		agentArgs = []string{"-server", "-node", private.String(), "-dc", dc, "-data-dir", "/tmp/consul"}
+		agentArgs = []string{"-server", "-node", "skydome-mqtt-" + private.String(), "-dc", dc, "-data-dir", "/tmp/consul"}
 	}
 	ui := &cli.BasicUi{Writer: os.Stdout}
 	agentCommand := &agent.Command{
@@ -33,6 +32,16 @@ func bootstrapConsul(dc string, bootstrap bool) {
 		ShutdownCh: make(chan struct{}),
 	}
 	agentCommand.Run(agentArgs)
+}
+
+func Join(args []string) {
+	log.Println("Sleeping for 3 seconds to consul come up....")
+	time.Sleep(3000 * time.Millisecond)
+	ui := &cli.BasicUi{Writer: os.Stdout}
+	joinCommand := &command.JoinCommand{
+		Ui: ui,
+	}
+	joinCommand.Run(args)
 }
 
 func bootstrapMqttServer() {
@@ -46,43 +55,6 @@ func bootstrapMqttServer() {
 	signal.Notify(c, os.Interrupt, syscall.SIGTERM)
 	<-c
 	h.Stop()
-}
-
-func Join(args []string) int {
-	log.Println("Sleeping for 3 seconds to consul come up....")
-	time.Sleep(3000 * time.Millisecond)
-	var wan bool
-	log.Println("Joining to cluster with addresses : ", args)
-	cmdFlags := flag.NewFlagSet("join", flag.ContinueOnError)
-	cmdFlags.BoolVar(&wan, "wan", false, "wan")
-	rpcAddr := command.RPCAddrFlag(cmdFlags)
-	if err := cmdFlags.Parse(args); err != nil {
-		fmt.Errorf("Error occured : %v", err)
-		return 1
-	}
-
-	addrs := cmdFlags.Args()
-	if len(addrs) == 0 {
-		log.Fatal("At least one address to join must be specified.")
-		return 1
-	}
-
-	client, err := command.RPCClient(*rpcAddr)
-	if err != nil {
-		log.Fatal("Error connecting to Consul agent: %s", err)
-		return 1
-	}
-	defer client.Close()
-
-	n, err := client.Join(addrs, wan)
-	if err != nil {
-		log.Fatal("Error joining the cluster: %s", err)
-		return 1
-	}
-
-	log.Println(
-		"Successfully joined cluster by contacting %d nodes.", n)
-	return 0
 }
 
 func main() {

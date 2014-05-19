@@ -17,6 +17,7 @@ ENV PATH $GOPATH/bin:$PATH
 
 ENTRYPOINT go get -v github.com/goskydome/mqtt-stack && cd /usr/local/gopath/src/github.com/goskydome/mqtt-stack && go get -d -v ./... && go build -v ./... && go install && /bin/bash
 
+EXPOSE 1883
 EXPOSE 8300
 EXPOSE 8301
 EXPOSE 8302

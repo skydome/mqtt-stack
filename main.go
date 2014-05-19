@@ -2,6 +2,7 @@ package main
 
 import (
 	"flag"
+	"fmt"
 	broker "github.com/abdulkadiryaman/hrotti/broker"
 	command "github.com/hashicorp/consul/command"
 	"github.com/hashicorp/consul/command/agent"
@@ -11,13 +12,12 @@ import (
 	"os"
 	"os/signal"
 	"syscall"
-	"time"
 )
 
 func bootstrapConsul(dc string, bootstrap bool) {
 	private, err := consul.GetPrivateIP()
 	if err != nil {
-		log.Fatal("err: %v", err)
+		fmt.Errorf("err: %v", err)
 	}
 
 	var agentArgs []string
@@ -32,17 +32,6 @@ func bootstrapConsul(dc string, bootstrap bool) {
 		ShutdownCh: make(chan struct{}),
 	}
 	agentCommand.Run(agentArgs)
-
-	time.Sleep(10 * time.Second)
-	joinArgs := []string{"172.17.0.2"}
-
-	Join(joinArgs)
-
-	//	joinCommand := &command.JoinCommand{
-	//		Ui: ui,
-	//	}
-	//	joinCommand.Run(joinArgs)
-
 }
 
 func bootstrapMqttServer() {
@@ -65,7 +54,7 @@ func Join(args []string) int {
 	cmdFlags.BoolVar(&wan, "wan", false, "wan")
 	rpcAddr := command.RPCAddrFlag(cmdFlags)
 	if err := cmdFlags.Parse(args); err != nil {
-		log.Fatal("Error occured : ", err)
+		fmt.Errorf("Error occured : %v", err)
 		return 1
 	}
 
@@ -94,7 +83,6 @@ func Join(args []string) int {
 }
 
 func main() {
-	log.Println("Arguments are : ", os.Args)
 	var bootstrap bool
 	if len(os.Args) < 2 {
 		bootstrap = true
@@ -103,5 +91,11 @@ func main() {
 	}
 
 	go bootstrapConsul("dc1", bootstrap)
+
+	if !bootstrap {
+		joinArgs := []string{"172.17.0.2"}
+		go Join(joinArgs)
+	}
+
 	bootstrapMqttServer()
 }

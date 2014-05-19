@@ -10,7 +10,7 @@ import (
 	"syscall"
 )
 
-func bootstrapConsul2(dc string, bootstrap bool) {
+func bootstrapConsul(dc string, bootstrap bool) {
 	var args []string
 	if bootstrap {
 		args = []string{"-server", "-bootstrap", "-node", "canawar", "-dc", dc, "-data-dir", "/tmp/consul"}
@@ -41,6 +41,6 @@ func bootstrapMqttServer() {
 }
 
 func main() {
-	go bootstrapConsul2("dc1", true)
+	go bootstrapConsul("dc1", true)
 	bootstrapMqttServer()
 }

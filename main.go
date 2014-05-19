@@ -11,7 +11,7 @@ import (
 )
 
 func bootstrapConsul2(dc string, bootstrap bool) {
-	var args
+	var args []string
 	if bootstrap {
 		args = []string{"-server", "-bootstrap", "-node", "canawar", "-dc", dc, "-data-dir", "/tmp/consul"}
 	}else{

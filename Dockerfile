@@ -7,7 +7,7 @@ env PATH /usr/local/go/bin:$PATH
 run pacman -S --noconfirm mercurial git llvm gcc
 run mkdir /usr/local/gopath
 env GOPATH "/usr/local/gopath"
-RUN go get github.com/goskydome/mqtt-stack
+RUN go get -v github.com/goskydome/mqtt-stack
 RUN cd $GOPATH/src/github.com/goskydome/mqtt-stack/
 RUN go get -d -v ./...
 RUN go build -v ./...

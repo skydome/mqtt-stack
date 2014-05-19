@@ -10,12 +10,13 @@ import (
 	"github.com/hashicorp/consul/command"
 	"fmt"
 	"net"
+	"log"
 )
 
 func bootstrapConsul(dc string, bootstrap bool) {
 	private, err := GetPrivateIP()
 	if err != nil {
-		fmt.Fprintf("err: %v", err)
+		log.Fatal("err: %v", err)
 	}
 
 	var agentArgs []string

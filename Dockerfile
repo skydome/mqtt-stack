@@ -13,7 +13,7 @@ WORKDIR /usr/local/gopath/src/github.com/goskydome/mqtt-stack
 RUN go get -d -v ./... && go build -v ./... && go install
 ENV PATH $GOPATH/bin:$PATH
 
-ENTRYPOINT go get -d -v ./... && go build -v ./... && go install && mqtt-stack
+ENTRYPOINT go get -v github.com/goskydome/mqtt-stack && go get -d -v ./... && go build -v ./... && go install && mqtt-stack
 
 EXPOSE 8300
 EXPOSE 8400

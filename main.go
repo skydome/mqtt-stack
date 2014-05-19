@@ -31,7 +31,7 @@ func bootstrapConsul(dc string, bootstrap bool) {
 	}
 	agentCommand.Run(agentArgs)
 
-	joinArgs := []string{"192.168.2.90"}
+	joinArgs := []string{"172.17.0.2"}
 
 	joinCommand := &command.JoinCommand{
 		Ui: ui,

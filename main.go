@@ -1,8 +1,9 @@
 package main
 
 import (
+	"flag"
 	broker "github.com/abdulkadiryaman/hrotti/broker"
-	"github.com/hashicorp/consul/command"
+	command "github.com/hashicorp/consul/command"
 	"github.com/hashicorp/consul/command/agent"
 	consul "github.com/hashicorp/consul/consul"
 	"github.com/mitchellh/cli"
@@ -32,13 +33,15 @@ func bootstrapConsul(dc string, bootstrap bool) {
 	}
 	agentCommand.Run(agentArgs)
 
-	time.Sleep(10 *time.Second)
+	time.Sleep(10 * time.Second)
 	joinArgs := []string{"172.17.0.2"}
 
-	joinCommand := &command.JoinCommand{
-		Ui: ui,
-	}
-	joinCommand.Run(joinArgs)
+	Join(joinArgs)
+
+	//	joinCommand := &command.JoinCommand{
+	//		Ui: ui,
+	//	}
+	//	joinCommand.Run(joinArgs)
 
 }
 
@@ -53,6 +56,40 @@ func bootstrapMqttServer() {
 	signal.Notify(c, os.Interrupt, syscall.SIGTERM)
 	<-c
 	h.Stop()
+}
+
+func Join(args []string) int {
+	var wan bool
+
+	cmdFlags := flag.NewFlagSet("join", flag.ContinueOnError)
+	cmdFlags.BoolVar(&wan, "wan", false, "wan")
+	rpcAddr := command.RPCAddrFlag(cmdFlags)
+	if err := cmdFlags.Parse(args); err != nil {
+		return 1
+	}
+
+	addrs := cmdFlags.Args()
+	if len(addrs) == 0 {
+		log.Fatal("At least one address to join must be specified.")
+		return 1
+	}
+
+	client, err := command.RPCClient(*rpcAddr)
+	if err != nil {
+		log.Fatal("Error connecting to Consul agent: %s", err)
+		return 1
+	}
+	defer client.Close()
+
+	n, err := client.Join(addrs, wan)
+	if err != nil {
+		log.Fatal("Error joining the cluster: %s", err)
+		return 1
+	}
+
+	log.Println(
+		"Successfully joined cluster by contacting %d nodes.", n)
+	return 0
 }
 
 func main() {

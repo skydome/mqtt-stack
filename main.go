@@ -54,6 +54,14 @@ func bootstrapMqttServer() {
 }
 
 func main() {
-	go bootstrapConsul("dc1", true)
+	log.Println("Arguments are : ", os.Args)
+	var bootstrap bool
+	if len(os.Args) < 2 {
+		bootstrap = true
+	} else {
+		bootstrap = os.Args[1] != "false"
+	}
+
+	go bootstrapConsul("dc1", bootstrap)
 	bootstrapMqttServer()
 }

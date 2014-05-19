@@ -1,0 +1,6 @@
+FROM rochacon/golang
+RUN go get github.com/goskydome/mqtt-stack
+RUN cd $GOPATH/src/github.com/goskydome/mqtt-stack/
+RUN go get -d -v ./...
+RUN go build -v ./...
+RUN go install

@@ -8,12 +8,14 @@ ENV PATH /usr/local/go/bin:$PATH
 RUN mkdir /usr/local/gopath
 ENV GOPATH /usr/local/gopath
 
-RUN go get -v github.com/goskydome/mqtt-stack
-WORKDIR /usr/local/gopath/src/github.com/goskydome/mqtt-stack
-RUN go get -d -v ./... && go build -v ./... && go install
+RUN go get -v github.com/abdulkadiryaman/hrotti
+RUN go get -v github.com/hashicorp/consul
+#WORKDIR /usr/local/gopath/src/github.com/goskydome/mqtt-stack
+#RUN go get -d -v ./... && go build -v ./... && go install
+
 ENV PATH $GOPATH/bin:$PATH
 
-ENTRYPOINT go get -v github.com/goskydome/mqtt-stack && go get -d -v ./... && go build -v ./... && go install && mqtt-stack
+ENTRYPOINT go get -v github.com/goskydome/mqtt-stack && cd /usr/local/gopath/src/github.com/goskydome/mqtt-stack && go get -d -v ./... && go build -v ./... && go install && mqtt-stack
 
 EXPOSE 8300
 EXPOSE 8400

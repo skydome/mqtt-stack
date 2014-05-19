@@ -10,6 +10,7 @@ import (
 	"os"
 	"os/signal"
 	"syscall"
+	"time"
 )
 
 func bootstrapConsul(dc string, bootstrap bool) {
@@ -31,6 +32,7 @@ func bootstrapConsul(dc string, bootstrap bool) {
 	}
 	agentCommand.Run(agentArgs)
 
+	time.Sleep(10 *time.Second)
 	joinArgs := []string{"172.17.0.2"}
 
 	joinCommand := &command.JoinCommand{

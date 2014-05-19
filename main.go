@@ -60,11 +60,12 @@ func bootstrapMqttServer() {
 
 func Join(args []string) int {
 	var wan bool
-
+	log.Println("Joining to cluster with addresses : ", args)
 	cmdFlags := flag.NewFlagSet("join", flag.ContinueOnError)
 	cmdFlags.BoolVar(&wan, "wan", false, "wan")
 	rpcAddr := command.RPCAddrFlag(cmdFlags)
 	if err := cmdFlags.Parse(args); err != nil {
+		log.Fatal("Error occured : ", err)
 		return 1
 	}
 

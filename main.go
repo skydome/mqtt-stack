@@ -8,10 +8,11 @@ import (
 	"github.com/hashicorp/consul/command/agent"
 	consul "github.com/hashicorp/consul/consul"
 	"github.com/mitchellh/cli"
-	"log"
 	"os"
 	"os/signal"
 	"syscall"
+	"time"
+	"log"
 )
 
 func bootstrapConsul(dc string, bootstrap bool) {
@@ -48,6 +49,8 @@ func bootstrapMqttServer() {
 }
 
 func Join(args []string) int {
+	log.Println("Sleeping for 3 seconds to consul come up....")
+	time.Sleep(3000 * time.Millisecond)
 	var wan bool
 	log.Println("Joining to cluster with addresses : ", args)
 	cmdFlags := flag.NewFlagSet("join", flag.ContinueOnError)

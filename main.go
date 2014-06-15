@@ -2,16 +2,17 @@ package main
 
 import (
 	"fmt"
-	broker "github.com/abdulkadiryaman/hrotti/broker"
-	command "github.com/hashicorp/consul/command"
-	"github.com/hashicorp/consul/command/agent"
-	consul "github.com/hashicorp/consul/consul"
-	"github.com/mitchellh/cli"
 	"log"
 	"os"
 	"os/signal"
 	"syscall"
 	"time"
+
+	broker "github.com/abdulkadiryaman/hrotti/broker"
+	command "github.com/hashicorp/consul/command"
+	"github.com/hashicorp/consul/command/agent"
+	consul "github.com/hashicorp/consul/consul"
+	"github.com/mitchellh/cli"
 )
 
 func bootstrapConsul(dc string, bootstrap bool) {
